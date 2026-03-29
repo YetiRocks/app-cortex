@@ -1,0 +1,13 @@
+name: "Cortex"
+app_id: "app-cortex"
+version: "0.1.0"
+description: "Persistent memory layer for AI agents. Semantic search, deduplication, classification, and real-time sync."
+
+schemas:
+  - schemas/schema.graphql
+
+resources:
+  - resources/*.rs
+
+auth:
+  methods: [jwt, basic]

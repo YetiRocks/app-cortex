@@ -1,0 +1,65 @@
+# Cortex — Persistent Memory Layer for AI Agents
+#
+# Memory: conversational context, decisions, action items, preferences
+# Synapse: project/coding context from CLAUDE.md, .cursor/rules, .windsurf/
+# Settings: per-tenant configuration (LLM provider, dedup threshold)
+#
+# Vector search via REST:
+#   GET /app-cortex/Memory?query=embedding==vector:"search text"&limit=10
+#   GET /app-cortex/Synapse?query=embedding==vector:"search text"&projectId==myproject&limit=10
+#
+# Real-time via SSE:
+#   GET /app-cortex/Memory?stream=sse
+#   GET /app-cortex/Synapse?stream=sse
+#
+# Real-time via MQTT:
+#   Subscribe to app-cortex/Memory, app-cortex/Synapse
+
+type Memory @table(database: "app-cortex") @export(sse: true, mqtt: true, public: [read, subscribe]) {
+    id: ID! @primaryKey
+    content: String!
+    source: String               # "conversation", "slack", "manual", "tool"
+    sourceId: String @indexed    # external reference (thread ID, message ID) — dedup key
+    agentId: String @indexed     # which agent stored this
+    channelId: String @indexed   # conversation/channel grouping
+    classification: String @indexed  # "decision", "action_item", "preference", "context", "insight", "architecture"
+    entities: String             # JSON array: [{name, type}] — people, projects, technologies
+    summary: String              # one-line summary
+    contentHash: String @indexed # deterministic content fingerprint for dedup
+    supersedes: String           # ID of memory this replaces (provenance chain)
+    createdAt: String!
+    updatedAt: String
+    metadata: String             # JSON: arbitrary key-value pairs
+    embedding: Vector @indexed(source: "content", model: "BAAI/bge-small-en-v1.5")
+}
+
+type Synapse @table(database: "app-cortex") @export(sse: true, mqtt: true, public: [read, subscribe]) {
+    id: ID! @primaryKey
+    projectId: String! @indexed
+    content: String!
+    source: String!              # file path or URL (e.g., ".claude/CLAUDE.md")
+    sourceFormat: String         # "claude-md", "cursor-rules", "windsurf", "markdown", "custom"
+    section: String              # heading/section name within source file
+    type: String @indexed        # "convention", "rule", "preference", "architecture", "constraint", "pattern"
+    tags: String                 # JSON array of searchable tags
+    entities: String             # JSON array: [{name, type}]
+    status: String @indexed      # "active", "superseded", "archived"
+    parentId: String             # parent section ID for hierarchical context
+    contentHash: String @indexed # dedup fingerprint
+    createdAt: String!
+    updatedAt: String
+    metadata: String             # JSON: arbitrary key-value pairs
+    embedding: Vector @indexed(source: "content", model: "BAAI/bge-small-en-v1.5")
+}
+
+type Settings @table(database: "app-cortex") @export {
+    id: ID! @primaryKey          # "default" or agent/tenant-specific key
+    classifyProvider: String     # "keyword" (default), "anthropic", "openai", "ollama"
+    classifyModel: String        # model identifier (e.g., "claude-haiku-4-5-20251001")
+    classifyApiKey: String       # API key for external LLM provider
+    classifyEndpoint: String     # custom endpoint URL (for ollama, proxies)
+    dedupEnabled: String         # "true" / "false" (default "true")
+    defaultSource: String        # default source tag for memories
+    maxMemoriesPerAgent: Int     # per-agent memory limit (0 = unlimited)
+    baseUrl: String              # self-reference URL for internal fetch (default "http://127.0.0.1:9996")
+}
