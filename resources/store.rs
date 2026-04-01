@@ -17,7 +17,7 @@ use yeti_sdk::prelude::*;
 // Response: { "id": "...", "action": "created"|"updated"|"duplicate", "classification": "..." }
 resource!(Store {
     name = "store",
-    create(request, ctx) => {
+    post(request, ctx) => {
         let body: Value = request.json()?;
 
         let content = body["content"].as_str()
@@ -115,12 +115,12 @@ resource!(Store {
 
         memory_table.put(&id, record).await?;
 
-        reply().code(201).json(json!({
+        created_json!({
             "id": id,
             "action": "created",
             "classification": classification,
             "contentHash": content_hash
-        }))
+        })
     }
 });
 

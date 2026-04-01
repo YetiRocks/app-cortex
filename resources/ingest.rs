@@ -14,7 +14,7 @@ use yeti_sdk::prelude::*;
 // Response: { "projectId": "...", "source": "...", "inserted": N, "updated": N, "unchanged": N }
 resource!(Ingest {
     name = "ingest",
-    create(request, ctx) => {
+    post(request, ctx) => {
         let body: Value = request.json()?;
 
         let project_id = body["projectId"].as_str()

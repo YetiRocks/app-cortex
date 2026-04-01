@@ -16,7 +16,7 @@ use yeti_sdk::prelude::*;
 // Response: { "classified": N, "results": [{ "id": "...", "classification": "..." }] }
 resource!(Classify {
     name = "classify",
-    create(request, ctx) => {
+    post(request, ctx) => {
         let body: Value = request.json()?;
         let memory_table = ctx.get_table("Memory")?;
         let settings_table = ctx.get_table("Settings")?;
@@ -119,16 +119,12 @@ fn classify_anthropic(content: &str, model: &str, api_key: &str) -> Result<Strin
         "messages": [{"role": "user", "content": format!("{}{}", CLASSIFY_PROMPT, truncate(content, 2000))}]
     });
 
-    let resp = fetch("https://api.anthropic.com/v1/messages", Some(FetchOptions {
-        method: "POST".into(),
-        headers: vec![
-            ("x-api-key".into(), api_key.into()),
-            ("anthropic-version".into(), "2023-06-01".into()),
-            ("content-type".into(), "application/json".into()),
-        ],
-        body: Some(body.to_string()),
-        ..Default::default()
-    }))?;
+    let resp = fetch!("POST", "https://api.anthropic.com/v1/messages")
+        .header("x-api-key", api_key)
+        .header("anthropic-version", "2023-06-01")
+        .header("content-type", "application/json")
+        .body(&body.to_string())
+        .send()?;
 
     if !resp.ok() {
         yeti_log!(warn, "Anthropic API error {}: {}", resp.status, resp.body);
@@ -152,15 +148,11 @@ fn classify_openai(content: &str, model: &str, api_key: &str) -> Result<String> 
         "messages": [{"role": "user", "content": format!("{}{}", CLASSIFY_PROMPT, truncate(content, 2000))}]
     });
 
-    let resp = fetch("https://api.openai.com/v1/chat/completions", Some(FetchOptions {
-        method: "POST".into(),
-        headers: vec![
-            ("Authorization".into(), format!("Bearer {api_key}")),
-            ("Content-Type".into(), "application/json".into()),
-        ],
-        body: Some(body.to_string()),
-        ..Default::default()
-    }))?;
+    let resp = fetch!("POST", "https://api.openai.com/v1/chat/completions")
+        .header("Authorization", &format!("Bearer {api_key}"))
+        .header("Content-Type", "application/json")
+        .body(&body.to_string())
+        .send()?;
 
     if !resp.ok() {
         yeti_log!(warn, "OpenAI API error {}: {}", resp.status, resp.body);
@@ -184,12 +176,10 @@ fn classify_ollama(content: &str, model: &str, endpoint: &str) -> Result<String>
         "options": { "num_predict": 32 }
     });
 
-    let resp = fetch(&url, Some(FetchOptions {
-        method: "POST".into(),
-        headers: vec![("Content-Type".into(), "application/json".into())],
-        body: Some(body.to_string()),
-        ..Default::default()
-    }))?;
+    let resp = fetch!("POST", &url)
+        .header("Content-Type", "application/json")
+        .body(&body.to_string())
+        .send()?;
 
     if !resp.ok() {
         yeti_log!(warn, "Ollama API error {}: {}", resp.status, resp.body);
