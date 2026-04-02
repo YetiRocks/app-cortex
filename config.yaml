@@ -1,5 +1,6 @@
 name: "Cortex"
 app_id: "app-cortex"
+customer_id: "yeti"
 version: "0.1.0"
 description: "Persistent memory layer for AI agents. Semantic search, deduplication, classification, and real-time sync."
 
