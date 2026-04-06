@@ -5,10 +5,11 @@ version: "0.1.0"
 description: "Persistent memory layer for AI agents. Semantic search, deduplication, classification, and real-time sync."
 
 schemas:
-  - schemas/schema.graphql
+  path: schemas/schema.graphql
 
 resources:
-  - resources/*.rs
+  path: resources/*.rs
+  route: /api
 
 auth:
   methods: [jwt, basic]
