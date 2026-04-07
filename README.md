@@ -49,7 +49,7 @@ Restart yeti. Cortex compiles automatically on first load (~2 minutes) and is ca
 ### 2. Store a memory
 
 ```bash
-curl -X POST https://localhost:9996/app-cortex/store \
+curl -X POST https://localhost/app-cortex/api/store \
   -H "Content-Type: application/json" \
   -d '{
     "content": "We decided to use RocksDB instead of LMDB for better write throughput",
@@ -73,7 +73,7 @@ The memory is automatically embedded via BAAI/bge-small-en-v1.5, classified as a
 ### 3. Search by meaning
 
 ```bash
-curl "https://localhost:9996/app-cortex/Memory?query=embedding==vector:\"storage engine choice\"&limit=5"
+curl "https://localhost/app-cortex/api/Memory?query=embedding==vector:\"storage engine choice\"&limit=5"
 ```
 
 Returns memories ranked by semantic similarity — not keyword matching. "Storage engine choice" finds the RocksDB decision even though neither word appears in the query.
@@ -82,7 +82,7 @@ Returns memories ranked by semantic similarity — not keyword matching. "Storag
 
 ```bash
 # SSE stream — get notified when any agent stores a memory
-curl "https://localhost:9996/app-cortex/Memory?stream=sse"
+curl "https://localhost/app-cortex/api/Memory?stream=sse"
 
 # MQTT — subscribe to memory changes
 mosquitto_sub -t "app-cortex/Memory" -h localhost -p 8883
@@ -91,7 +91,7 @@ mosquitto_sub -t "app-cortex/Memory" -h localhost -p 8883
 ### 5. Ingest project context
 
 ```bash
-curl -X POST https://localhost:9996/app-cortex/ingest \
+curl -X POST https://localhost/app-cortex/api/ingest \
   -H "Content-Type: application/json" \
   -d '{
     "projectId": "my-project",
@@ -118,7 +118,7 @@ Each `##` section becomes a separate Synapse record with its own vector embeddin
 ### 6. Search project context
 
 ```bash
-curl "https://localhost:9996/app-cortex/Synapse?query=embedding==vector:\"naming conventions\"&projectId==my-project&limit=5"
+curl "https://localhost/app-cortex/api/Synapse?query=embedding==vector:\"naming conventions\"&projectId==my-project&limit=5"
 ```
 
 ---
@@ -157,7 +157,7 @@ AI Agents (Claude Code, Cursor, Windsurf, ChatGPT, local models)
 
 ## Features
 
-### Memory Storage (POST /app-cortex/store)
+### Memory Storage (POST /app-cortex/api/store)
 
 Smart memory storage with built-in deduplication:
 
@@ -175,7 +175,7 @@ Smart memory storage with built-in deduplication:
 2. Computes content hash: if identical content already exists, returns existing record (returns `"action": "duplicate"`)
 3. Otherwise: inserts new record with auto-classification and auto-embedding (returns `"action": "created"`)
 
-### Context Ingestion (POST /app-cortex/ingest)
+### Context Ingestion (POST /app-cortex/api/ingest)
 
 Ingest project configuration files and make them semantically searchable:
 
@@ -200,7 +200,7 @@ Ingest project configuration files and make them semantically searchable:
 | Markdown | Any `.md` file |
 | Custom | Everything else |
 
-### Classification (POST /app-cortex/classify)
+### Classification (POST /app-cortex/api/classify)
 
 Classify or reclassify memories using keyword rules or external LLMs:
 
@@ -237,13 +237,13 @@ Vector search is built into the platform via `@indexed(source: "content")`. No c
 
 ```bash
 # Search memories by meaning
-GET /app-cortex/Memory?query=embedding==vector:"your search text"&limit=10
+GET /app-cortex/api/Memory?query=embedding==vector:"your search text"&limit=10
 
 # Search with structured filters
-GET /app-cortex/Memory?query=embedding==vector:"search"&classification==decision&agentId==claude-1&limit=10
+GET /app-cortex/api/Memory?query=embedding==vector:"search"&classification==decision&agentId==claude-1&limit=10
 
 # Search project context
-GET /app-cortex/Synapse?query=embedding==vector:"search"&projectId==my-project&limit=10
+GET /app-cortex/api/Synapse?query=embedding==vector:"search"&projectId==my-project&limit=10
 ```
 
 ### Real-Time Streaming (auto-generated)
@@ -252,8 +252,8 @@ Real-time updates are built into the platform via `@export(sse: true, mqtt: true
 
 ```bash
 # SSE — server-sent events
-GET /app-cortex/Memory?stream=sse
-GET /app-cortex/Synapse?stream=sse
+GET /app-cortex/api/Memory?stream=sse
+GET /app-cortex/api/Synapse?stream=sse
 
 # MQTT — subscribe to changes
 mosquitto_sub -t "app-cortex/Memory" -h localhost -p 8883
@@ -268,16 +268,16 @@ Full CRUD on all tables is auto-generated from the schema:
 
 | Endpoint | Methods | Description |
 |----------|---------|-------------|
-| `/app-cortex/Memory` | GET, POST | List/create memories |
-| `/app-cortex/Memory/{id}` | GET, PUT, DELETE | Read/update/delete a memory |
-| `/app-cortex/Synapse` | GET, POST | List/create synapse entries |
-| `/app-cortex/Synapse/{id}` | GET, PUT, DELETE | Read/update/delete a synapse entry |
-| `/app-cortex/Settings` | GET, POST | List/create settings |
-| `/app-cortex/Settings/{id}` | GET, PUT, DELETE | Read/update/delete settings |
+| `/app-cortex/api/Memory` | GET, POST | List/create memories |
+| `/app-cortex/api/Memory/{id}` | GET, PUT, DELETE | Read/update/delete a memory |
+| `/app-cortex/api/Synapse` | GET, POST | List/create synapse entries |
+| `/app-cortex/api/Synapse/{id}` | GET, PUT, DELETE | Read/update/delete a synapse entry |
+| `/app-cortex/api/Settings` | GET, POST | List/create settings |
+| `/app-cortex/api/Settings/{id}` | GET, PUT, DELETE | Read/update/delete settings |
 
 ### MCP Tools (auto-generated)
 
-MCP tools for table operations are auto-generated from `@export` schemas. Any MCP-compatible agent (Claude Code, Cursor, Windsurf) can discover and use them via the standard MCP protocol at `POST /app-cortex/mcp`.
+MCP tools for table operations are auto-generated from `@export` schemas. Any MCP-compatible agent (Claude Code, Cursor, Windsurf) can discover and use them via the standard MCP protocol at `POST /app-cortex/api/mcp`.
 
 ---
 
@@ -336,16 +336,16 @@ MCP tools for table operations are auto-generated from `@export` schemas. Any MC
 | `dedupEnabled` | String | "true" (default) or "false" |
 | `defaultSource` | String | Default source tag for new memories |
 | `maxMemoriesPerAgent` | Int | Per-agent memory limit (0 = unlimited) |
-| `baseUrl` | String | Self-reference URL (default http://127.0.0.1:9996) |
+| `baseUrl` | String | Self-reference URL (default http://127.0.0.1) |
 
 ---
 
 ## Configuration
 
-### Settings (POST /app-cortex/Settings)
+### Settings (POST /app-cortex/api/Settings)
 
 ```bash
-curl -X POST https://localhost:9996/app-cortex/Settings \
+curl -X POST https://localhost/app-cortex/api/Settings \
   -H "Content-Type: application/json" \
   -d '{
     "id": "default",
