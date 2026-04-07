@@ -49,7 +49,7 @@ Restart yeti. Cortex compiles automatically on first load (~2 minutes) and is ca
 ### 2. Store a memory
 
 ```bash
-curl -X POST https://localhost/app-cortex/api/store \
+curl -X POST https://localhost:9996/app-cortex/api/store \
   -H "Content-Type: application/json" \
   -d '{
     "content": "We decided to use RocksDB instead of LMDB for better write throughput",
@@ -73,7 +73,7 @@ The memory is automatically embedded via BAAI/bge-small-en-v1.5, classified as a
 ### 3. Search by meaning
 
 ```bash
-curl "https://localhost/app-cortex/api/Memory?query=embedding==vector:\"storage engine choice\"&limit=5"
+curl "https://localhost:9996/app-cortex/api/Memory?query=embedding==vector:\"storage engine choice\"&limit=5"
 ```
 
 Returns memories ranked by semantic similarity — not keyword matching. "Storage engine choice" finds the RocksDB decision even though neither word appears in the query.
@@ -82,7 +82,7 @@ Returns memories ranked by semantic similarity — not keyword matching. "Storag
 
 ```bash
 # SSE stream — get notified when any agent stores a memory
-curl "https://localhost/app-cortex/api/Memory?stream=sse"
+curl "https://localhost:9996/app-cortex/api/Memory?stream=sse"
 
 # MQTT — subscribe to memory changes
 mosquitto_sub -t "app-cortex/Memory" -h localhost -p 8883
@@ -91,7 +91,7 @@ mosquitto_sub -t "app-cortex/Memory" -h localhost -p 8883
 ### 5. Ingest project context
 
 ```bash
-curl -X POST https://localhost/app-cortex/api/ingest \
+curl -X POST https://localhost:9996/app-cortex/api/ingest \
   -H "Content-Type: application/json" \
   -d '{
     "projectId": "my-project",
@@ -118,7 +118,7 @@ Each `##` section becomes a separate Synapse record with its own vector embeddin
 ### 6. Search project context
 
 ```bash
-curl "https://localhost/app-cortex/api/Synapse?query=embedding==vector:\"naming conventions\"&projectId==my-project&limit=5"
+curl "https://localhost:9996/app-cortex/api/Synapse?query=embedding==vector:\"naming conventions\"&projectId==my-project&limit=5"
 ```
 
 ---
@@ -345,7 +345,7 @@ MCP tools for table operations are auto-generated from `@export` schemas. Any MC
 ### Settings (POST /app-cortex/api/Settings)
 
 ```bash
-curl -X POST https://localhost/app-cortex/api/Settings \
+curl -X POST https://localhost:9996/app-cortex/api/Settings \
   -H "Content-Type: application/json" \
   -d '{
     "id": "default",
