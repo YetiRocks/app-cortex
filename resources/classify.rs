@@ -61,7 +61,7 @@ resource!(Classify {
         }
 
         if targets.is_empty() {
-            return reply().json(json!({ "classified": 0, "results": [] }));
+            return ok(json!({ "classified": 0, "results": [] }));
         }
 
         let mut results: Vec<Value> = Vec::new();
@@ -89,7 +89,7 @@ resource!(Classify {
             }));
         }
 
-        reply().json(json!({
+        ok(json!({
             "classified": results.len(),
             "results": results
         }))

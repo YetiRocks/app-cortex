@@ -70,7 +70,7 @@ resource!(Store {
                     "entities": record["entities"].as_str().unwrap_or("[]"),
                 });
                 memory_table.put(id, updated).await?;
-                return reply().json(json!({
+                return ok(json!({
                     "id": id,
                     "action": "updated",
                     "contentHash": content_hash
@@ -86,7 +86,7 @@ resource!(Store {
             });
             if let Some(record) = existing {
                 let id = record["id"].as_str().unwrap_or("");
-                return reply().json(json!({
+                return ok(json!({
                     "id": id,
                     "action": "duplicate",
                     "contentHash": content_hash

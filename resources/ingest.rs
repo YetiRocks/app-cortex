@@ -124,7 +124,7 @@ resource!(Ingest {
             }
         }
 
-        reply().json(json!({
+        ok(json!({
             "projectId": project_id,
             "source": source,
             "sourceFormat": source_format,
