@@ -16,8 +16,8 @@ use yeti_sdk::prelude::*;
 // Response: { "classified": N, "results": [{ "id": "...", "classification": "..." }] }
 resource!(Classify {
     name = "classify",
-    post(request, ctx) => {
-        let body: Value = request.json()?;
+    post(ctx) => {
+        let body: Value = ctx.require_json_body()?.clone();
         let memory_table = ctx.get_table("Memory")?;
         let settings_table = ctx.get_table("Settings")?;
 

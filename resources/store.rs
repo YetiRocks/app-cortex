@@ -17,8 +17,8 @@ use yeti_sdk::prelude::*;
 // Response: { "id": "...", "action": "created"|"updated"|"duplicate", "classification": "..." }
 resource!(Store {
     name = "store",
-    post(request, ctx) => {
-        let body: Value = request.json()?;
+    post(ctx) => {
+        let body: Value = ctx.require_json_body()?.clone();
 
         let content = body["content"].as_str()
             .ok_or_else(|| YetiError::Validation("missing required field: content".into()))?;

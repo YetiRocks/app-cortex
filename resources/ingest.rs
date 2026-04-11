@@ -14,8 +14,8 @@ use yeti_sdk::prelude::*;
 // Response: { "projectId": "...", "source": "...", "inserted": N, "updated": N, "unchanged": N }
 resource!(Ingest {
     name = "ingest",
-    post(request, ctx) => {
-        let body: Value = request.json()?;
+    post(ctx) => {
+        let body: Value = ctx.require_json_body()?.clone();
 
         let project_id = body["projectId"].as_str()
             .ok_or_else(|| YetiError::Validation("missing required field: projectId".into()))?;
