@@ -115,12 +115,12 @@ resource!(Store {
 
         memory_table.put(&id, record).await?;
 
-        reply().code(201).json(json!({
+        created_json!({
             "id": id,
             "action": "created",
             "classification": classification,
             "contentHash": content_hash
-        }))
+        })
     }
 });
 
