@@ -9,7 +9,7 @@ schemas:
 
 resources:
   path: resources/*.rs
-  route: /api
+  root: /api
 
 auth:
   methods: [jwt, basic]
