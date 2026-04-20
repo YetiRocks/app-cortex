@@ -32,7 +32,7 @@ resource!(Store {
             return bad_request("content exceeds 64KB limit");
         }
 
-        let memory_table = ctx.get_table("Memory")?;
+        let memory_table = ctx.table("Memory")?;
         let source = body["source"].as_str().unwrap_or("manual");
         let source_id = body["sourceId"].as_str().unwrap_or("");
         let agent_id = body["agentId"].as_str().unwrap_or("");

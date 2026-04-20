@@ -18,8 +18,8 @@ resource!(Classify {
     name = "classify",
     post(ctx) => {
         let body: Value = ctx.require_json_body()?.clone();
-        let memory_table = ctx.get_table("Memory")?;
-        let settings_table = ctx.get_table("Settings")?;
+        let memory_table = ctx.table("Memory")?;
+        let settings_table = ctx.table("Settings")?;
 
         // Load settings
         let settings = settings_table.get("default").await?.unwrap_or(json!({}));

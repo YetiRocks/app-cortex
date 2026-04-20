@@ -34,7 +34,7 @@ resource!(Ingest {
         let tags = body["tags"].as_str().unwrap_or("[]");
         let now = unix_timestamp()?.to_string();
 
-        let synapse_table = ctx.get_table("Synapse")?;
+        let synapse_table = ctx.table("Synapse")?;
 
         // Chunk content by ## headings
         let chunks = chunk_markdown(content);
