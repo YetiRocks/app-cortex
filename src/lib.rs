@@ -8,8 +8,6 @@
 //! dylib path; a follow-up commit then moves modules/ → src/ and
 //! drops the `#[path]` attrs.
 
-#[macro_use]
-extern crate yeti_sdk;
 
 use yeti_sdk::extensions::{RegistrationContext, Service};
 use yeti_sdk::prelude::*;
