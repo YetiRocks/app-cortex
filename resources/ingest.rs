@@ -115,7 +115,7 @@ resource!(Ingest {
             if let Some(section) = record["section"].as_str() {
                 if !current_headings.contains(&section) {
                     if let Some(id) = record["id"].as_str() {
-                        let mut archived = record.clone().clone();
+                        let mut archived = (*record).clone();
                         archived["status"] = json!("superseded");
                         archived["updatedAt"] = json!(&now);
                         synapse_table.put(id, archived).await?;

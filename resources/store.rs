@@ -192,7 +192,7 @@ fn classify_keyword(content: &str) -> &'static str {
 }
 
 /// Basic entity extraction via keyword patterns
-fn extract_entities_basic(content: &str) -> String {
+fn extract_entities_basic(_content: &str) -> String {
     // v1: return empty array. Full NER requires LLM or dedicated model.
     "[]".to_string()
 }

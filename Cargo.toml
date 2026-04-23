@@ -1,0 +1,21 @@
+[package]
+name = "app-cortex"
+edition = "2024"
+description = "Cortex"
+version = "0.1.0"
+
+[package.metadata.app]
+customer_id = "yeti"
+schemas = "schemas/schema.graphql"
+resources = "resources/*.rs"
+
+[package.metadata.auth]
+allow_signup = true
+
+[package.metadata.auth.basic]
+enabled = true
+
+[package.metadata.auth.jwt]
+enabled = true
+
+[dependencies]
