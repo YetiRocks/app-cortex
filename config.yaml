@@ -1,0 +1,17 @@
+name: "Cortex"
+app_id: "app-cortex"
+customer_id: "yeti"
+version: "0.1.0"
+description: "Cortex"
+
+schemas:
+  path: schemas/schema.graphql
+
+resources:
+  path: "resources/*.rs"
+  root: /api
+
+auth:
+  methods: [jwt, basic]
+  signup: auto
+  email_signup: true
