@@ -127,7 +127,7 @@ fn classify_anthropic(content: &str, model: &str, api_key: &str) -> Result<Strin
         .send()?;
 
     if !resp.ok() {
-        yeti_log!(warn, "Anthropic API error {}: {}", resp.status, resp.body);
+        tracing::warn!("Anthropic API error {}: {}", resp.status, resp.body);
         return Ok(classify_keyword(content).to_string());
     }
 
@@ -155,7 +155,7 @@ fn classify_openai(content: &str, model: &str, api_key: &str) -> Result<String> 
         .send()?;
 
     if !resp.ok() {
-        yeti_log!(warn, "OpenAI API error {}: {}", resp.status, resp.body);
+        tracing::warn!("OpenAI API error {}: {}", resp.status, resp.body);
         return Ok(classify_keyword(content).to_string());
     }
 
@@ -182,7 +182,7 @@ fn classify_ollama(content: &str, model: &str, endpoint: &str) -> Result<String>
         .send()?;
 
     if !resp.ok() {
-        yeti_log!(warn, "Ollama API error {}: {}", resp.status, resp.body);
+        tracing::warn!("Ollama API error {}: {}", resp.status, resp.body);
         return Ok(classify_keyword(content).to_string());
     }
 
