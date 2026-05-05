@@ -390,7 +390,7 @@ All models run locally via ONNX. No API keys, no external calls, no internet req
 
 ```
 app-cortex/
-├── config.yaml              # App configuration
+├── Cargo.toml               # App configuration ([package.metadata.app])
 ├── schemas/
 │   └── schema.graphql       # Memory, Synapse, Settings tables
 └── resources/
@@ -399,16 +399,44 @@ app-cortex/
     └── classify.rs          # LLM/keyword classification pipeline
 ```
 
+App configuration lives in `Cargo.toml` under `[package.metadata.app]`. There is no separate `config.yaml` or `services.yaml`:
+
+```toml
+[package]
+name = "app-cortex"
+edition = "2024"
+
+[package.metadata.app]
+schemas = "schemas/schema.graphql"
+resources = "resources/*.rs"
+```
+
 ---
 
 ## Authentication
 
 Cortex uses yeti's built-in auth system. In development mode, all endpoints are accessible without authentication. In production:
 
-- **JWT** and **Basic Auth** supported (configured in config.yaml)
+- **JWT** and **Basic Auth** supported (configured in `Cargo.toml` under `[package.metadata.auth]`)
 - Memory and Synapse tables allow public `read` and `subscribe` access
 - Write operations (store, ingest, classify) require authentication
 - Settings table requires authentication for all operations
+
+To enable auth, add a `[package.metadata.auth]` block to `Cargo.toml`:
+
+```toml
+[package.metadata.auth]
+allow_signup = false
+default_role = "agent"
+
+[package.metadata.auth.oauth]
+providers = [
+  { name = "google", client_id = "${GOOGLE_CLIENT_ID}", client_secret = "${GOOGLE_CLIENT_SECRET}" },
+]
+rules = [
+  { strategy = "email", pattern = "*@yetirocks.com", role = "admin" },
+]
+```
 
 For multi-tenant deployments, use yeti-auth's role system to scope agents to their own memories via `agentId` filters.
 
