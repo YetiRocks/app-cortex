@@ -119,7 +119,7 @@ fn classify_anthropic(content: &str, model: &str, api_key: &str) -> Result<Strin
         "messages": [{"role": "user", "content": format!("{}{}", CLASSIFY_PROMPT, truncate(content, 2000))}]
     });
 
-    let resp = fetch!("POST", "https://api.anthropic.com/v1/messages")
+    let resp = yeti_sdk::utils::fetch::FetchBuilder::post("https://api.anthropic.com/v1/messages")
         .header("x-api-key", api_key)
         .header("anthropic-version", "2023-06-01")
         .header("content-type", "application/json")
@@ -148,7 +148,7 @@ fn classify_openai(content: &str, model: &str, api_key: &str) -> Result<String> 
         "messages": [{"role": "user", "content": format!("{}{}", CLASSIFY_PROMPT, truncate(content, 2000))}]
     });
 
-    let resp = fetch!("POST", "https://api.openai.com/v1/chat/completions")
+    let resp = yeti_sdk::utils::fetch::FetchBuilder::post("https://api.openai.com/v1/chat/completions")
         .header("Authorization", &format!("Bearer {api_key}"))
         .header("Content-Type", "application/json")
         .body(&body.to_string())
@@ -176,7 +176,7 @@ fn classify_ollama(content: &str, model: &str, endpoint: &str) -> Result<String>
         "options": { "num_predict": 32 }
     });
 
-    let resp = fetch!("POST", &url)
+    let resp = yeti_sdk::utils::fetch::FetchBuilder::post(&url)
         .header("Content-Type", "application/json")
         .body(&body.to_string())
         .send()?;

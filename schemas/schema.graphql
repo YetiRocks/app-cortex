@@ -15,7 +15,7 @@
 # Real-time via MQTT:
 #   Subscribe to app-cortex/Memory, app-cortex/Synapse
 
-type Memory @table(database: "app-cortex") @export(sse: true, mqtt: true, public: [read, subscribe]) {
+type Memory @table(database: "app-cortex") @export(sse: true, mqtt: true) @access(public: [read, subscribe]) {
     id: ID! @primaryKey
     content: String!
     source: String               # "conversation", "slack", "manual", "tool"
@@ -33,7 +33,7 @@ type Memory @table(database: "app-cortex") @export(sse: true, mqtt: true, public
     embedding: Vector @indexed(source: "content", model: "BAAI/bge-small-en-v1.5")
 }
 
-type Synapse @table(database: "app-cortex") @export(sse: true, mqtt: true, public: [read, subscribe]) {
+type Synapse @table(database: "app-cortex") @export(sse: true, mqtt: true) @access(public: [read, subscribe]) {
     id: ID! @primaryKey
     projectId: String! @indexed
     content: String!
