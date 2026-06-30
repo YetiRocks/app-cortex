@@ -213,7 +213,8 @@ fn classify_section(heading: &str, content: &str) -> &'static str {
     let h = heading.to_lowercase();
     let c = content.to_lowercase();
 
-    if h.contains("rule") || h.contains("constraint") || c.contains("must ") || c.contains("never ") {
+    if h.contains("rule") || h.contains("constraint") || c.contains("must ") || c.contains("never ")
+    {
         "rule"
     } else if h.contains("convention") || h.contains("style") || h.contains("format") {
         "convention"

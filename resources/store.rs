@@ -146,44 +146,65 @@ fn classify_keyword(content: &str) -> &'static str {
     let lower = content.to_lowercase();
 
     // Decision signals
-    if lower.contains("decided") || lower.contains("chose") || lower.contains("agreed")
-        || lower.contains("went with") || lower.contains("decision:")
-        || lower.contains("we'll use") || lower.contains("settled on")
+    if lower.contains("decided")
+        || lower.contains("chose")
+        || lower.contains("agreed")
+        || lower.contains("went with")
+        || lower.contains("decision:")
+        || lower.contains("we'll use")
+        || lower.contains("settled on")
     {
         return "decision";
     }
 
     // Action item signals
-    if lower.contains("todo") || lower.contains("to-do") || lower.contains("need to")
-        || lower.contains("should ") || lower.contains("action item")
-        || lower.contains("task:") || lower.contains("next step")
-        || lower.contains("follow up") || lower.contains("must ")
+    if lower.contains("todo")
+        || lower.contains("to-do")
+        || lower.contains("need to")
+        || lower.contains("should ")
+        || lower.contains("action item")
+        || lower.contains("task:")
+        || lower.contains("next step")
+        || lower.contains("follow up")
+        || lower.contains("must ")
     {
         return "action_item";
     }
 
     // Preference signals
-    if lower.contains("prefer") || lower.contains("always use")
-        || lower.contains("never use") || lower.contains("like to")
-        || lower.contains("don't like") || lower.contains("preference:")
-        || lower.contains("style:") || lower.contains("convention:")
+    if lower.contains("prefer")
+        || lower.contains("always use")
+        || lower.contains("never use")
+        || lower.contains("like to")
+        || lower.contains("don't like")
+        || lower.contains("preference:")
+        || lower.contains("style:")
+        || lower.contains("convention:")
     {
         return "preference";
     }
 
     // Architecture signals
-    if lower.contains("architecture") || lower.contains("design pattern")
-        || lower.contains("structure") || lower.contains("module")
-        || lower.contains("component") || lower.contains("layer")
-        || lower.contains("interface") || lower.contains("api design")
+    if lower.contains("architecture")
+        || lower.contains("design pattern")
+        || lower.contains("structure")
+        || lower.contains("module")
+        || lower.contains("component")
+        || lower.contains("layer")
+        || lower.contains("interface")
+        || lower.contains("api design")
     {
         return "architecture";
     }
 
     // Insight signals
-    if lower.contains("learned") || lower.contains("realized") || lower.contains("turns out")
-        || lower.contains("insight:") || lower.contains("discovery:")
-        || lower.contains("found that") || lower.contains("key takeaway")
+    if lower.contains("learned")
+        || lower.contains("realized")
+        || lower.contains("turns out")
+        || lower.contains("insight:")
+        || lower.contains("discovery:")
+        || lower.contains("found that")
+        || lower.contains("key takeaway")
     {
         return "insight";
     }

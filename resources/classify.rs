@@ -112,7 +112,11 @@ fn classify_anthropic(content: &str, model: &str, api_key: &str) -> Result<Strin
     if api_key.is_empty() {
         return Ok(classify_keyword(content).to_string());
     }
-    let model = if model.is_empty() { "claude-haiku-4-5-20251001" } else { model };
+    let model = if model.is_empty() {
+        "claude-haiku-4-5-20251001"
+    } else {
+        model
+    };
     let body = json!({
         "model": model,
         "max_tokens": 32,
@@ -131,8 +135,7 @@ fn classify_anthropic(content: &str, model: &str, api_key: &str) -> Result<Strin
         return Ok(classify_keyword(content).to_string());
     }
 
-    let parsed: Value = serde_json::from_str(&resp.body)
-        .unwrap_or(json!({}));
+    let parsed: Value = serde_json::from_str(&resp.body).unwrap_or(json!({}));
     let text = parsed["content"][0]["text"].as_str().unwrap_or("");
     Ok(normalize_classification(text))
 }
@@ -141,32 +144,42 @@ fn classify_openai(content: &str, model: &str, api_key: &str) -> Result<String> 
     if api_key.is_empty() {
         return Ok(classify_keyword(content).to_string());
     }
-    let model = if model.is_empty() { "gpt-4o-mini" } else { model };
+    let model = if model.is_empty() {
+        "gpt-4o-mini"
+    } else {
+        model
+    };
     let body = json!({
         "model": model,
         "max_tokens": 32,
         "messages": [{"role": "user", "content": format!("{}{}", CLASSIFY_PROMPT, truncate(content, 2000))}]
     });
 
-    let resp = yeti_sdk::utils::fetch::FetchBuilder::post("https://api.openai.com/v1/chat/completions")
-        .header("Authorization", &format!("Bearer {api_key}"))
-        .header("Content-Type", "application/json")
-        .body(&body.to_string())
-        .send()?;
+    let resp =
+        yeti_sdk::utils::fetch::FetchBuilder::post("https://api.openai.com/v1/chat/completions")
+            .header("Authorization", &format!("Bearer {api_key}"))
+            .header("Content-Type", "application/json")
+            .body(&body.to_string())
+            .send()?;
 
     if !resp.ok() {
         tracing::warn!("OpenAI API error {}: {}", resp.status, resp.body);
         return Ok(classify_keyword(content).to_string());
     }
 
-    let parsed: Value = serde_json::from_str(&resp.body)
-        .unwrap_or(json!({}));
-    let text = parsed["choices"][0]["message"]["content"].as_str().unwrap_or("");
+    let parsed: Value = serde_json::from_str(&resp.body).unwrap_or(json!({}));
+    let text = parsed["choices"][0]["message"]["content"]
+        .as_str()
+        .unwrap_or("");
     Ok(normalize_classification(text))
 }
 
 fn classify_ollama(content: &str, model: &str, endpoint: &str) -> Result<String> {
-    let endpoint = if endpoint.is_empty() { "http://127.0.0.1:11434" } else { endpoint };
+    let endpoint = if endpoint.is_empty() {
+        "http://127.0.0.1:11434"
+    } else {
+        endpoint
+    };
     let model = if model.is_empty() { "llama3.2" } else { model };
     let url = format!("{}/api/generate", endpoint);
     let body = json!({
@@ -186,14 +199,18 @@ fn classify_ollama(content: &str, model: &str, endpoint: &str) -> Result<String>
         return Ok(classify_keyword(content).to_string());
     }
 
-    let parsed: Value = serde_json::from_str(&resp.body)
-        .unwrap_or(json!({}));
+    let parsed: Value = serde_json::from_str(&resp.body).unwrap_or(json!({}));
     let text = parsed["response"].as_str().unwrap_or("");
     Ok(normalize_classification(text))
 }
 
 const VALID_CLASSES: &[&str] = &[
-    "decision", "action_item", "preference", "architecture", "insight", "context"
+    "decision",
+    "action_item",
+    "preference",
+    "architecture",
+    "insight",
+    "context",
 ];
 
 fn normalize_classification(raw: &str) -> String {
@@ -213,32 +230,49 @@ fn normalize_classification(raw: &str) -> String {
 
 fn classify_keyword(content: &str) -> &'static str {
     let lower = content.to_lowercase();
-    if lower.contains("decided") || lower.contains("chose") || lower.contains("agreed")
-        || lower.contains("went with") || lower.contains("decision:")
-        || lower.contains("we'll use") || lower.contains("settled on")
+    if lower.contains("decided")
+        || lower.contains("chose")
+        || lower.contains("agreed")
+        || lower.contains("went with")
+        || lower.contains("decision:")
+        || lower.contains("we'll use")
+        || lower.contains("settled on")
     {
         return "decision";
     }
-    if lower.contains("todo") || lower.contains("to-do") || lower.contains("need to")
-        || lower.contains("should ") || lower.contains("action item")
-        || lower.contains("task:") || lower.contains("next step")
-        || lower.contains("follow up") || lower.contains("must ")
+    if lower.contains("todo")
+        || lower.contains("to-do")
+        || lower.contains("need to")
+        || lower.contains("should ")
+        || lower.contains("action item")
+        || lower.contains("task:")
+        || lower.contains("next step")
+        || lower.contains("follow up")
+        || lower.contains("must ")
     {
         return "action_item";
     }
-    if lower.contains("prefer") || lower.contains("always use")
-        || lower.contains("never use") || lower.contains("like to")
-        || lower.contains("don't like") || lower.contains("preference:")
+    if lower.contains("prefer")
+        || lower.contains("always use")
+        || lower.contains("never use")
+        || lower.contains("like to")
+        || lower.contains("don't like")
+        || lower.contains("preference:")
     {
         return "preference";
     }
-    if lower.contains("architecture") || lower.contains("design pattern")
-        || lower.contains("structure") || lower.contains("api design")
+    if lower.contains("architecture")
+        || lower.contains("design pattern")
+        || lower.contains("structure")
+        || lower.contains("api design")
     {
         return "architecture";
     }
-    if lower.contains("learned") || lower.contains("realized") || lower.contains("turns out")
-        || lower.contains("insight:") || lower.contains("found that")
+    if lower.contains("learned")
+        || lower.contains("realized")
+        || lower.contains("turns out")
+        || lower.contains("insight:")
+        || lower.contains("found that")
     {
         return "insight";
     }
