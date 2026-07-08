@@ -15,7 +15,7 @@
 # Real-time via MQTT:
 #   Subscribe to app-cortex/Memory, app-cortex/Synapse
 
-type Memory @table(database: "app-cortex") @export(sse: true, mqtt: true) @access(public: [read, subscribe]) {
+type Memory @table(database: "app-cortex") @distribute @export(sse: true, mqtt: true) @access(public: [read, subscribe]) {
     id: ID! @primaryKey
     content: String!
     source: String               # "conversation", "slack", "manual", "tool"
