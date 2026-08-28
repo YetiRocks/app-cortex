@@ -7,3 +7,7 @@ target/
 /target/
 /Cargo.lock
 /web/
+
+# Runtime output, not source (deployment mirror + build cache).
+/deployments/
+/cache/
