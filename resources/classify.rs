@@ -19,7 +19,10 @@ resource!(Classify {
     post(ctx) => {
         let body: Value = ctx.require_json_body()?.clone();
         let memory_table = ctx.table("Memory")?;
-        let settings_table = ctx.table("Settings")?;
+        // System handle (ADR-038, YTC-1905): `Settings` holds the app's own
+        // classifier configuration (model, provider API key). The app reads it
+        // to do its job; the caller is never handed it and needs no grant on it.
+        let settings_table = ctx.system().table("Settings")?;
 
         // Load settings
         let settings = settings_table.get("default").await?.unwrap_or(json!({}));
