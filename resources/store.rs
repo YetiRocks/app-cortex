@@ -1,5 +1,8 @@
 use yeti_sdk::prelude::*;
 
+/// The role that may write memories and project context (`auth/roles.json`).
+const ROLE_WRITER: &str = "app-cortex:writer";
+
 // Store memories with content-hash deduplication and optional auto-classification.
 //
 // POST /app-cortex/store
@@ -18,6 +21,16 @@ use yeti_sdk::prelude::*;
 resource!(Store {
     name = "store",
     post(ctx) => {
+        // Writes `Memory`, so it needs an authenticated caller holding the
+        // `writer` role (auth/roles.json grants it the write). Refused before
+        // any work; the write itself runs on the caller's handle, so the
+        // role's table grant is enforced again by the store (YTC-1905).
+        if !ctx.access().is_authenticated() {
+            return unauthorized("POST /app-cortex/store needs an authenticated caller");
+        }
+        if !(ctx.access().is_super_user() || ctx.access().has_role(ROLE_WRITER)) {
+            return error_response(403, "POST /app-cortex/store needs the app-cortex:writer role");
+        }
         let body: Value = ctx.require_json_body()?.clone();
 
         let content = body["content"].as_str()

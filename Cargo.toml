@@ -8,6 +8,7 @@ version = "0.1.0"
 account_id = "yeti"
 schemas = "schemas/schema.graphql"
 resources = "resources/*.rs"
+loaders = { auth = "auth/roles.json" }
 
 [package.metadata.auth]
 allow_signup = true

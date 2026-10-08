@@ -1,0 +1,17 @@
+[
+  {
+    "id": "app-cortex:writer",
+    "appId": "app-cortex",
+    "name": "Writer",
+    "permission": {
+      "databases": {
+        "app-cortex": {
+          "tables": {
+            "Memory":  { "read": true, "insert": true, "update": true, "delete": false },
+            "Synapse": { "read": true, "insert": true, "update": true, "delete": false }
+          }
+        }
+      }
+    }
+  }
+]

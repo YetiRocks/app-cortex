@@ -1,5 +1,8 @@
 use yeti_sdk::prelude::*;
 
+/// The role that may write memories and project context (`auth/roles.json`).
+const ROLE_WRITER: &str = "app-cortex:writer";
+
 // Classify or reclassify memories using an LLM or keyword fallback.
 //
 // POST /app-cortex/classify
@@ -17,6 +20,16 @@ use yeti_sdk::prelude::*;
 resource!(Classify {
     name = "classify",
     post(ctx) => {
+        // Writes `Memory`, so it needs an authenticated caller holding the
+        // `writer` role (auth/roles.json grants it the write). Refused before
+        // any work; the write itself runs on the caller's handle, so the
+        // role's table grant is enforced again by the store (YTC-1905).
+        if !ctx.access().is_authenticated() {
+            return unauthorized("POST /app-cortex/classify needs an authenticated caller");
+        }
+        if !(ctx.access().is_super_user() || ctx.access().has_role(ROLE_WRITER)) {
+            return error_response(403, "POST /app-cortex/classify needs the app-cortex:writer role");
+        }
         let body: Value = ctx.require_json_body()?.clone();
         let memory_table = ctx.table("Memory")?;
         // System handle (ADR-038, YTC-1905): `Settings` holds the app's own
