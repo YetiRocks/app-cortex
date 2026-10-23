@@ -268,11 +268,11 @@ Full CRUD on all tables is auto-generated from the schema:
 
 | Endpoint | Methods | Description |
 |----------|---------|-------------|
-| `/app-cortex/api/Memory` | GET, POST | List/create memories |
+| `/app-cortex/api/Memory/` | GET, POST | List/create memories |
 | `/app-cortex/api/Memory/{id}` | GET, PUT, DELETE | Read/update/delete a memory |
-| `/app-cortex/api/Synapse` | GET, POST | List/create synapse entries |
+| `/app-cortex/api/Synapse/` | GET, POST | List/create synapse entries |
 | `/app-cortex/api/Synapse/{id}` | GET, PUT, DELETE | Read/update/delete a synapse entry |
-| `/app-cortex/api/Settings` | GET, POST | List/create settings |
+| `/app-cortex/api/Settings/` | GET, POST | List/create settings |
 | `/app-cortex/api/Settings/{id}` | GET, PUT, DELETE | Read/update/delete settings |
 
 ### MCP Tools (auto-generated)
@@ -345,7 +345,7 @@ MCP tools for table operations are auto-generated from `@export` schemas. Any MC
 ### Settings (POST /app-cortex/api/Settings)
 
 ```bash
-curl -X POST https://localhost:9996/app-cortex/api/Settings \
+curl -X POST https://localhost:9996/app-cortex/api/Settings/ \
   -H "Content-Type: application/json" \
   -d '{
     "id": "default",
